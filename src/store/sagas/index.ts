@@ -1,37 +1,59 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { call, fork, put, takeEvery } from 'redux-saga/effects';
-import { getData } from '../../api';
+import { all, call, fork, spawn } from 'redux-saga/effects';
 
-// business logic
-// fork for parallel requests, call for consecutive requests
-// non-blocking effects - fork, spawn, call - blocks queu
-// FORK saga effect - error from parent tasks bubble up to their parents and cancell its further execution
-// SPAWN - don't cancell parent tasks
-export function* workerSaga() {
-  yield fork(loadPeople);
-  yield fork(loadPlanets);
+export function* saga1() {
+  console.log('SAGA1');
 }
-
-// actions
-export function* watchLoadDataSaga() {
-  yield takeEvery('LOAD_DATA', workerSaga);
+export function* saga2() {
+  console.log('SAGA2');
+}
+export function* saga3() {
+  console.log('SAGA3');
 }
 
 export default function* rootSaga() {
-  yield fork(watchLoadDataSaga);
-}
+  // 1 parallel execution, if at least one is failed - rootSaga will be interrupted, next workers wont be executed
+  // code will be blocked till execution of this saga's array
+  yield [(saga1(), saga2(), saga3())];
 
-// function for creation of parallel tasks
-export function* loadPeople() {
-  // @ts-ignore
-  const people = yield call(getData, '/people');
+  // OR
 
-  yield put({ type: 'SET_PEOPLE', payload: people.results });
-}
+  // 2 parallel execution, if at least one is failed - rootSaga will be interrupted, next workers wont be executed
+  // code will be executed immediately, fork isn't blocking effect
+  yield [(fork(saga1), fork(saga2), fork(saga3))];
 
-export function* loadPlanets() {
-  // @ts-ignore
-  const planets = yield call(getData, '/planets');
+  // OR
 
-  yield put({ type: 'SET_PLANETS', payload: planets.results });
+  // 3 the same as 2 way, but you can separate different domains
+  yield fork(saga1); // auth
+  yield fork(saga2); //users
+  yield fork(saga3); // payments
+
+  // OR
+
+  // 4 parallel execution, if at one is failed - rootSaga will be executed further
+  yield spawn(saga1); // auth
+  yield spawn(saga2); //users
+  yield spawn(saga3); // payments
+
+  // OR
+
+  const sagas = [saga1, saga2, saga3];
+
+  const retrySagas = sagas.map((saga) => {
+    return spawn(function* () {
+      while (true) {
+        try {
+          yield call(saga);
+          break;
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    });
+  });
+
+  // some familiarity ith Promise.all()
+  yield all(retrySagas);
+
+  // ... code ...
 }

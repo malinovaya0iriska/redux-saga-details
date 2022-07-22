@@ -5,12 +5,7 @@ export const App = () => {
   const store = useAppSelector((store) => store);
   console.log({ store });
 
-  return (
-    <div>
-      Redux-Saga
-      <button onClick={() => dispatch({ type: 'LOAD_DATA' })}>Click</button>
-    </div>
-  );
+  return <div></div>;
 };
 
 export default App;
