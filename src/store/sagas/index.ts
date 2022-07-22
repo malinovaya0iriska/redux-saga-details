@@ -4,16 +4,12 @@ import { getData } from '../../api';
 
 // business logic
 // fork for parallel requests, call for consecutive requests
-// non-blocking effects - fork, spawn
+// non-blocking effects - fork, spawn, call - blocks queu
 // FORK saga effect - error from parent tasks bubble up to their parents and cancell its further execution
 // SPAWN - don't cancell parent tasks
 export function* workerSaga() {
   yield fork(loadPeople);
   yield fork(loadPlanets);
-
-  // compare effects if Error occures
-  // yield spawn(loadPeople);
-  // yield spawn(loadPlanets);
 }
 
 // actions
@@ -27,7 +23,10 @@ export default function* rootSaga() {
 
 // function for creation of parallel tasks
 export function* loadPeople() {
-  throw new Error();
+  // @ts-ignore
+  const people = yield call(getData, '/people');
+
+  yield put({ type: 'SET_PEOPLE', payload: people.results });
 }
 
 export function* loadPlanets() {
