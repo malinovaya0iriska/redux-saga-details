@@ -8,7 +8,7 @@ export const App = () => {
   return (
     <div>
       Redux-Saga
-      <button onClick={() => dispatch({ type: 'CLICK' })}>Click</button>
+      <button onClick={() => dispatch({ type: 'LOAD_DATA' })}>Click</button>
     </div>
   );
 };

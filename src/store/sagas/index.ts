@@ -1,18 +1,18 @@
-import { takeLatest } from 'redux-saga/effects';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { call, put, takeEvery } from 'redux-saga/effects';
+import { getPeople } from '../../api';
 
-const wait = (delay: number) => new Promise((res) => setTimeout(res, delay));
 // business logic
 export function* workerSaga() {
-  yield wait(1000);
-  console.log('click from saga');
+  // @ts-ignore
+  const data = yield call(getPeople, '/people');
+
+  yield put({ type: 'SET_PEOPLE', payload: data.results });
 }
 
 // actions
 export function* watchClickSaga() {
-  // yield takeEvery('CLICK', workerSaga);
-
-  yield takeLatest('CLICK', workerSaga);
-  // yield takeLeading('CLICK', workerSaga);
+  yield takeEvery('LOAD_DATA', workerSaga);
 }
 
 export default function* rootSaga() {
