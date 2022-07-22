@@ -1,3 +1,23 @@
+const initialState: IRootData = {
+  people: [],
+  planets: [],
+};
+
+export const rootReducer = (
+  state: IRootData = initialState,
+  action: any,
+): IRootData => {
+  const { type, payload } = action;
+  switch (type) {
+    case 'SET_PEOPLE':
+      return { ...state, people: [...state.people, ...payload] };
+    case 'SET_PLANETS':
+      return { ...state, planets: [...state.planets, ...payload] };
+    default:
+      return state;
+  }
+};
+
 interface ICharacter {
   birth_year: string;
   created: string;
@@ -16,20 +36,23 @@ interface ICharacter {
   url: string;
   vehicles: string[];
 }
+interface IPlanet {
+  climate: string;
+  created: string;
+  diameter: string;
+  edited: string;
+  films: string[];
+  gravity: string;
+  name: string;
+  orbital_period: string;
+  population: string;
+  residents: string[];
+  rotation_period: string;
+  surface_water: string;
+  terrain: string;
+  url: string;
+}
 interface IRootData {
   people: ICharacter[];
+  planets: IPlanet[];
 }
-
-const initialState = {
-  people: [],
-};
-
-export const rootReducer = (state: any = initialState, action: any) => {
-  const { type, payload } = action;
-  switch (type) {
-    case 'SET_PEOPLE':
-      return { ...state, people: [...state.people, ...payload] };
-    default:
-      return state;
-  }
-};
