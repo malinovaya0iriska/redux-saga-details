@@ -1,9 +1,9 @@
 import { createBrowserHistory } from 'history';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
+import { applyMiddleware, compose, createStore } from 'redux';
 import { createReduxHistoryContext } from 'redux-first-history';
 import createSagaMiddleware from 'redux-saga';
-import { rootReducer } from './reducers';
+import { AppStateType, rootReducer } from './reducers';
 import rootSaga from './sagas';
 
 declare global {
@@ -15,16 +15,12 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const sagaMiddleware = createSagaMiddleware();
 
-const { createReduxHistory, routerMiddleware, routerReducer } =
-  createReduxHistoryContext({
-    history: createBrowserHistory(),
-  });
+const { createReduxHistory, routerMiddleware } = createReduxHistoryContext({
+  history: createBrowserHistory(),
+});
 
 export const store = createStore(
-  combineReducers({
-    router: routerReducer,
-    root: rootReducer,
-  }),
+  rootReducer,
   composeEnhancers(
     applyMiddleware(sagaMiddleware),
     applyMiddleware(routerMiddleware),
@@ -32,8 +28,6 @@ export const store = createStore(
 );
 
 sagaMiddleware.run(rootSaga);
-
-export type AppStateType = ReturnType<typeof store.getState>;
 
 export type AppDispatch = typeof store.dispatch;
 

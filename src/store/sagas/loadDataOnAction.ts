@@ -1,29 +1,26 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { actionChannel, apply, call, put, take } from 'redux-saga/effects';
+import { SagaIterator } from 'redux-saga';
+import { actionChannel, call, put, take } from 'redux-saga/effects';
 import { BASE_URL } from '../../api';
 
 // pattern take + call + actionChannel
-// collect all actions and execute them one by one
+// collect all actions and execute them one by one on turn
 
-export default function* loadDataOnAction() {
-  // @ts-ignore
+export default function* loadDataOnAction(): SagaIterator<void> {
   const channel = yield actionChannel('LOAD_DATA');
   while (true) {
-    // @ts-ignore
     yield take(channel);
 
-    // @ts-ignore
     yield call(fetchDataOnAction);
   }
 }
 
-export function* fetchDataOnAction() {
+export function* fetchDataOnAction(): SagaIterator<void> {
   console.log('Fetching started .... ');
 
-  // @ts-ignore
   const response = yield call(fetch, `${BASE_URL}/planets`);
-  // @ts-ignore
-  const data = yield apply(response, response.json);
+
+  const data = yield call([response, response.json]);
   console.log('PLANETS', data);
 
   yield put({ type: 'PLANETS_LOADED', payload: data });

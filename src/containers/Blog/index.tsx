@@ -1,13 +1,12 @@
-import { useAppDispatch, useAppSelector } from './../../store/index';
+import * as actionCreators from '../../store/actionCreators';
+import { useAppDispatch } from './../../store/index';
 
 export const Blog = () => {
   const dispatch = useAppDispatch();
-  const blogData = useAppSelector((state) => state.root.blog);
 
   const handleLoadData = (): void => {
-    dispatch({ type: 'LOAD_DATA' });
+    dispatch(actionCreators.getPeople({ search: '', page: 1 }));
   };
-  console.log('Blog', blogData);
 
   return (
     <div>

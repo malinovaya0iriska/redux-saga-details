@@ -1,13 +1,17 @@
-const initialState = { blog: {} };
+import { createBrowserHistory } from 'history';
+import { combineReducers } from 'redux';
+import { createReduxHistoryContext } from 'redux-first-history';
+import { characterInfoReducer } from './characterInfoReducer';
+import { peopleReducer } from './peopleReducer';
 
-export const rootReducer = (state: any = initialState, action: any) => {
-  const { type, payload } = action;
-  switch (type) {
-    case 'BLOG_LOADED':
-      return { ...state, blog: payload };
-    case 'PLANETS_LOADED':
-      return { ...state, planets: payload };
-    default:
-      return state;
-  }
-};
+const { routerReducer } = createReduxHistoryContext({
+  history: createBrowserHistory(),
+});
+
+export const rootReducer = combineReducers({
+  router: routerReducer,
+  people: peopleReducer,
+  character: characterInfoReducer,
+});
+
+export type AppStateType = ReturnType<typeof rootReducer>;
